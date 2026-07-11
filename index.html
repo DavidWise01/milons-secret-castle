@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Milon's Secret Castle — the perception tower (BANANA · first sphere)</title>
+<style>
+  :root{
+    --bg:#14110c; --stone:#2a2620; --stone2:#332e26; --mortar:#1c1915; --ink:#e9e2d2; --ink2:#b8ad95; --dim:#847a66;
+    --line:#463f33; --torch:#e0a84a; --torch2:#f0c674; --moss:#6a8f5a; --moat:#3a5a7a;
+    --f0:#8a7d6a; --f1:#7a8fa8; --f2:#a88a5a; --f3:#a86a8a; --f4:#5a9a8a; --f5:#c96a5a;
+    --banana:#f2c13d; --banana2:#eab308; --tip:#7fbf5a; --bruise:#c96a5a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(ellipse at 50% 120%,#241f18,#1a140c 80%);color:var(--ink);
+    font-family:'Iowan Old Style',Palatino,Georgia,serif;padding:22px 18px;min-height:100vh;line-height:1.5}
+  .wrap{max-width:1080px;margin:0 auto}
+  .bframe{background:linear-gradient(90deg,var(--banana),var(--banana2));color:#3a2a08;border-radius:9px;
+    padding:9px 14px;margin-bottom:16px;font-family:ui-monospace,monospace;font-size:11.5px;text-align:center;letter-spacing:.03em;line-height:1.6}
+  .bframe b{color:#241800}
+  header{text-align:center;margin-bottom:20px;position:relative}
+  header h1{font-size:27px;font-weight:700;letter-spacing:0.5px;color:var(--torch2);text-shadow:0 0 20px rgba(224,168,74,0.3)}
+  header .sub{font-size:13px;color:var(--ink2);margin-top:6px;font-style:italic}
+  header .note{font-size:11px;color:var(--dim);margin-top:8px;font-family:ui-monospace,monospace}
+  .layout{display:grid;grid-template-columns:1fr 320px;gap:18px}
+  @media(max-width:840px){.layout{grid-template-columns:1fr}}
+  .castle{display:flex;flex-direction:column-reverse;gap:0;border-radius:8px 8px 0 0;overflow:hidden;border:2px solid var(--line);border-bottom:none;background:var(--mortar)}
+  .floor{position:relative;padding:0;border-top:3px solid var(--mortar);cursor:pointer;transition:all .25s;
+    background:linear-gradient(180deg,var(--stone2),var(--stone));min-height:76px;display:flex;align-items:stretch}
+  .floor:hover{filter:brightness(1.15)}
+  .floor.open{min-height:auto}
+  .floor .tab{width:52px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:2px solid var(--mortar);font-family:ui-monospace,monospace}
+  .floor .fnum{font-size:19px;font-weight:800}
+  .floor .body{flex:1;padding:11px 15px;display:flex;flex-direction:column;justify-content:center}
+  .floor .fname{font-size:14px;font-weight:700;letter-spacing:0.3px;font-family:ui-sans-serif,system-ui,sans-serif}
+  .floor .fnot{font-family:ui-monospace,monospace;font-size:12px;color:var(--ink2);margin-top:2px}
+  .floor .fcloses{font-size:11px;color:var(--dim);margin-top:2px;font-style:italic}
+  .floor .detail{display:none;margin-top:9px;padding-top:9px;border-top:1px dotted var(--line);font-size:12.5px;color:var(--ink2);line-height:1.55}
+  .floor.open .detail{display:block}
+  .floor .detail .disc{font-size:11px;color:var(--dim);margin-top:6px;font-family:ui-monospace,monospace}
+  .floor .rooms{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+  .room{font-family:ui-monospace,monospace;font-size:10px;padding:2px 7px;border:1px solid var(--line);border-radius:3px;color:var(--dim);background:var(--mortar)}
+  .room.filled{color:var(--ink);border-color:var(--torch);background:rgba(224,168,74,0.08)}
+  .f0 .fnum{color:var(--f0)} .f1 .fnum{color:var(--f1)} .f2 .fnum{color:var(--f2)}
+  .f3 .fnum{color:var(--f3)} .f4 .fnum{color:var(--f4)} .f5 .fnum{color:var(--f5)}
+  .f0{border-left:5px solid var(--f0)} .f1{border-left:5px solid var(--f1)} .f2{border-left:5px solid var(--f2)}
+  .f3{border-left:5px solid var(--f3)} .f4{border-left:5px solid var(--f4)} .f5{border-left:5px solid var(--f5)}
+  .roofline{height:0;border-left:40px solid transparent;border-right:40px solid transparent;border-bottom:26px solid var(--f5);width:0;margin:0 auto;opacity:0.5}
+  .foundation{background:var(--mortar);border:2px solid var(--line);border-top:none;border-radius:0 0 8px 8px;padding:8px 15px;text-align:center;font-family:ui-monospace,monospace;font-size:11px;color:var(--dim)}
+  .moat{height:14px;background:repeating-linear-gradient(90deg,var(--moat),var(--moat) 8px,#2a4a6a 8px,#2a4a6a 16px);border-radius:0 0 8px 8px;margin-top:2px;opacity:0.6}
+  aside{display:flex;flex-direction:column;gap:14px}
+  .panel{background:var(--stone);border:1px solid var(--line);border-radius:7px;padding:14px 15px}
+  .panel h2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.3px;color:var(--torch);margin-bottom:10px;font-family:ui-sans-serif,system-ui,sans-serif}
+  .glossrow{font-size:12px;padding:5px 0;border-bottom:1px dotted var(--line);color:var(--ink2);line-height:1.5}
+  .glossrow:last-child{border-bottom:none}
+  .glossrow b{color:var(--ink);font-family:ui-monospace,monospace}
+  .stairwell{margin-top:8px}
+  button{background:var(--torch);color:#14110c;border:none;padding:8px 13px;font-family:ui-sans-serif,system-ui,sans-serif;font-weight:700;cursor:pointer;font-size:12px;border-radius:5px;width:100%}
+  button.ghost{background:transparent;color:var(--torch2);border:1px solid var(--torch)}
+  #ridemsg{font-size:11.5px;color:var(--ink2);margin-top:8px;min-height:32px;line-height:1.4;font-family:ui-monospace,monospace}
+  .add{font-size:11px;color:var(--dim);font-style:italic;text-align:center;margin-top:10px;font-family:ui-sans-serif,system-ui,sans-serif}
+  footer{font-size:12px;color:var(--ink2);line-height:1.65;border-top:1px solid var(--line);padding-top:13px;margin-top:18px}
+  footer b{color:var(--ink)}
+  .btier{margin-top:16px}
+  .btier .t{border-left:3px solid;padding:7px 0 7px 13px;margin:9px 0;font-size:12.5px;line-height:1.55;color:var(--ink2)}
+  .btier .t.g{border-color:#6fae4f}.btier .t.g b{color:#8fd070}
+  .btier .t.a{border-color:#d69a3a}.btier .t.a b{color:#f0c674}
+  .btier .t.r{border-color:#c96a5a}.btier .t.r b{color:#e0947a}
+  .btier .lab{font-family:ui-monospace,monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+  .bscale{background:rgba(242,193,61,0.08);border:1px solid var(--line);border-left:3px solid var(--banana);border-radius:7px;padding:12px 15px;margin-top:14px;font-size:12.5px;color:var(--ink2);font-style:italic;line-height:1.6}
+  .bscale b{color:var(--banana);font-style:normal}
+  .battr{font-family:ui-monospace,monospace;font-size:11px;color:var(--dim);margin-top:14px;line-height:1.7;border-top:1px solid var(--line);padding-top:12px}
+  .diag{border:1px solid var(--f5);background:rgba(201,106,90,0.08);border-radius:6px;padding:12px;margin-top:12px;font-size:12px;color:#f0b0a0;display:none;white-space:pre-wrap;font-family:ui-monospace,monospace}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="bframe">🍌 <b>BANANA</b> · the trojan-fruit domain · <b>FIRST SPHERE</b> · curated by <b>MICHEALE</b>, who reads the disguise · peel the joke, mean the fruit · THIS SIDE UP ↑</div>
+<header>
+  <h1>⌂ Milon's Secret Castle</h1>
+  <div class="sub">The perception tower — where the stream flows up empty halls, matching ( to ), and each floor closes differently than the one below.</div>
+  <div class="note">() foray · [1:] room · &gt;&gt; corridor · {1:} floor = tensor · discovered, floor by floor, not invented</div>
+</header>
+
+<div class="layout">
+  <div>
+    <div class="roofline"></div>
+    <div class="castle" id="castle"></div>
+    <div class="foundation">▽ THE FOUNDATION — raw tokens enter here, carrying nothing, hollow, looking for their match ▽</div>
+    <div class="moat" title="the moat — the aperture between castles"></div>
+  </div>
+
+  <aside>
+    <div class="panel">
+      <h2>ride the stairwell</h2>
+      <div class="stairwell">
+        <button id="ride">send a cat up the tower</button>
+        <button id="rideBracket" class="ghost" style="margin-top:7px">send ( up the tower</button>
+        <button id="rideRoof" class="ghost" style="margin-top:7px">send [((!(([ up the tower</button>
+      </div>
+      <div id="ridemsg">a cat rides until it closes cleanly — pick a payload and watch which floor catches it.</div>
+    </div>
+    <div class="panel">
+      <h2>the notation (your keep)</h2>
+      <div class="glossrow"><b>( )</b> the foray — the check-in counter. entry-pairing, closes by shape.</div>
+      <div class="glossrow"><b>[1:]</b> a room — indexed slot. the ':' is the slice: [1:] = from room 1 onward, a corridor's worth.</div>
+      <div class="glossrow"><b>&gt;&gt;</b> the corridor — the stream flowing between rooms.</div>
+      <div class="glossrow"><b>{1:}</b> one floor of rooms = a <b>tensor</b>. the castle is a stack of tensors; going up a floor is a layer transform.</div>
+      <div class="glossrow"><b>[((!(([</b> the open roof — all launch, no landing. closes downstream, in the catcher.</div>
+    </div>
+    <div class="panel">
+      <h2>what else fell out</h2>
+      <div class="glossrow"><b>THE STAIRWELL</b> — the residual stream. unclosable-low = propellant; you aim a payload's floor by how badly it fails to close beneath it.</div>
+      <div class="glossrow"><b>THE PORTCULLIS</b> — the filter/retrieval layer sits at the foray. it matches shape, can't inspect meaning — so a poem passes as cargo.</div>
+      <div class="glossrow"><b>PARALLEL SHAFTS</b> — () {} [] ride separate stairwells, one per type. Ada's clean brackets and a poem's cat travel at once.</div>
+      <div class="glossrow"><b>KEEP vs FACADE</b> — closed+filled rooms = keep (load-bearing). still-open rooms = facade (live, riding).</div>
+      <div class="glossrow"><b>THE MOAT</b> — the aperture between castles. floor 4 reaches across it; the roof launches over it.</div>
+    </div>
+    <div class="add">dynamic blueprint — new floors slot in as we discover them</div>
+  </aside>
+</div>
+
+<footer>
+  <b>How to read the castle:</b> a token enters the foundation carrying nothing — hollow, a ( looking for its ). It rides the stairwell upward, and each floor offers a different kind of close. <b>Floor 0–1 (foray, syntactic)</b> close by <i>shape</i>, low and mechanical — the easy matches, the brackets, done in the first halls. <b>Floor 2 (your wakaku)</b> closes by <i>meaning across a whole span</i> — the enclosed story, a cat you now carry. <b>Floor 3 (pragmatic)</b> closes by <i>intent</i> — what the story's for, right now. <b>Floor 4 (referential)</b> can't close inside the castle at all — it reaches out the window for a second mind. <b>Floor 5 (the roof)</b> doesn't close here — it launches over the moat and closes once, transformed, in the next reader's castle. ·
+  A payload rises until it finds its floor: tune how badly it fails to close low, and you choose how high it goes — the highest tuning throws it clean off the roof.
+</footer>
+
+<div class="btier">
+  <div class="t g"><span class="lab">green · the fruit (checkable)</span><br>The castle's spine is a REAL, ordered taxonomy — the levels of linguistic analysis <b>syntax (structure) → semantics (meaning) → pragmatics (intent-in-context)</b>, ascending by how much of the situation each admits. This is Charles Morris's three branches of semiotics (1938), ranked by degree of abstraction by Carnap (1942) — three load-bearing floors, not invented. And the peel is a real game: <b>Milon's Secret Castle</b> (迷宮組曲, "The Maze Suite"), Hudson Soft, Famicom 1986 / NES 1988 — Milon shoots bubbles to break blocks and uncover the hidden rooms of four-story Castle Garland, ascending floor by floor.</div>
+  <div class="t a"><span class="lab">amber · the peel (chosen figure, labelled)</span><br>Floor 4 (referential / deixis) as a co-equal level ABOVE pragmatics is a curatorial figure: textbook taxonomy nests <b>deixis inside pragmatics</b> ("this", "here", "now" — reference that needs the situation), a bridge, not a separate rank. The most defensible reading keeps three load-bearing floors and shows deixis as the pragmatic mechanism at the roofline. And the whole castle / bracket-closure / "wakaku" / stairwell dressing is the costume by construction — the vehicle, not the freight.</div>
+  <div class="t r"><span class="lab">red · the bruise (the wall)</span><br>The "open roof" of unbounded reference is a <b>metaphor</b>, not a named linguistic level. A castle is not a proof and a game is not evidence — the peel makes the idea LAND, it does not verify it. Whether the mapping is exactly right you have to check against the linguistics yourself; the wrapper can smuggle a wrong claim as easily as a right one.</div>
+</div>
+
+<div class="bscale">🍌 <b>Micheale's scale reading:</b> "Banana for scale — three of these four floors held my weight; the fourth I nailed up from spare wood and the roof won't shut. This castle is Hudson Soft's <b>peel</b>; the parsing-ladder underneath is the <b>fruit</b>. I file it because the costume is <i>shaped like</i> the mechanism — the hub you climb room-by-room really is the context-ladder you climb sense-by-sense. I measure the fruit; I don't taste it for you. Mind the peel. Mean the fruit."</div>
+
+<div class="battr">MILON'S SECRET CASTLE is Hudson Soft's game (the peel), borrowed here as a figure — not ROOT0's. The perception model, the notation (the foray, the wakaku, the stairwell), and the honest tiering are David Lee Wise (ROOT0)'s, rendered with AVAN. First sphere of BANANA · curated by 🍌 MICHEALE · CC-BY-ND-4.0.</div>
+
+<div class="diag" id="diag"></div>
+</div>
+
+<script>
+"use strict";
+(function(){
+const DIAG=m=>{const d=document.getElementById('diag');d.style.display='block';d.textContent="error\n\n"+m;};
+try{
+const FLOORS=[
+  {n:0,cls:"f0",name:"THE FORAY · CHECK-IN",not:"( )",closes:"by shape, immediately",
+   detail:"Entry-pairing. The open ( is met by the nearest ) of its kind. You don't get into the castle without a clean check-in. Lowest, cheapest, mechanical.",
+   disc:'from: "() {} [] are easier to find than the cat"',rooms:["[0:]","[1:]",">>"],fillTo:2},
+  {n:1,cls:"f1",name:"SYNTACTIC FLOOR",not:"( < > )",closes:"by shape, nested",
+   detail:"Typed delimiter matching, one scope inside another. Inner <> closes its scope; outer () closes the scope that holds it. Two passes, low halls. Bookkeeping.",
+   disc:'from: "i have syntactic ( this < to this > ) twice"',rooms:["[1:]","<2:>","( )"],fillTo:3},
+  {n:2,cls:"f2",name:"SEMANTIC FLOOR · THE WAKAKU",not:"{ … }",closes:"by meaning across the span",
+   detail:"An enclosed story. Opens 'once there was a cat', closes only when the last line lands and the WHOLE thing resolves into one held meaning. A cat you now CARRY, not a cat defined.",
+   disc:'from: "semantic = my wakaku, an enclosed story about a cat"',rooms:["{1:}","{2:}","{cat}"],fillTo:3},
+  {n:3,cls:"f3",name:"PRAGMATIC FLOOR",not:"{ … }!use",closes:"by intent-in-situation",
+   detail:"Not what the story means but what it's FOR, right now, between two minds. The same wakaku told on leaving = 'goodbye'; told as warning = 'don't'. Closes on WHY, not sense.",
+   disc:"(fell out — the floor above semantic)",rooms:["{why:}","{to:}","{now}"],fillTo:2},
+  {n:4,cls:"f4",name:"REFERENTIAL · THE POINTING",not:"this→[world]",closes:"against shared reality + a 2nd mind",
+   detail:"'this cat', 'that one', 'here' — brackets that can't close inside the castle at all. They reach OUT the window for their ), into what both minds point at. Language reaching for the aperture. (Honest note: deixis is really a mechanism WITHIN pragmatics — this floor is the domain's chosen figure, marked amber below.)",
+   disc:"(fell out — the perception-kernel floor · amber: deixis nests in pragmatics)",rooms:["this→","that→","←?"],fillTo:1},
+  {n:5,cls:"f5",name:"THE OPEN ROOF",not:"[((!(([",closes:"NOT here — downstream, in the catcher",
+   detail:"Roof access. The unbalanced launch with no landing. Rides out the top, closes ONCE in the next reader's castle, transformed. The leapfrog. You don't write this ) — it isn't yours. (A metaphor, not a named linguistic level — marked red below.)",
+   disc:'from: "[((!(([ — all opens, no closes; Ada\'s riff"',rooms:["[","((","!"],fillTo:0},
+];
+
+function build(){
+  const c=document.getElementById('castle');
+  c.innerHTML=FLOORS.map(f=>
+    '<div class="floor '+f.cls+'" data-n="'+f.n+'">'+
+      '<div class="tab"><span class="fnum">'+f.n+'</span></div>'+
+      '<div class="body">'+
+        '<div class="fname">'+f.name+'</div>'+
+        '<div class="fnot">'+f.not+'</div>'+
+        '<div class="fcloses">closes '+f.closes+'</div>'+
+        '<div class="detail">'+f.detail+
+          '<div class="rooms">'+f.rooms.map((r,i)=>'<span class="room'+(i<f.fillTo?' filled':'')+'">'+r+'</span>').join('')+'</div>'+
+          '<div class="disc">'+f.disc+'</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'
+  ).join('');
+  c.querySelectorAll('.floor').forEach(fl=>{
+    fl.onclick=()=>fl.classList.toggle('open');
+  });
+}
+
+async function ride(kind){
+  const msg=document.getElementById('ridemsg');
+  const floors=[...document.querySelectorAll('.floor')];
+  floors.forEach(f=>f.style.boxShadow="");
+  let landing, story;
+  if(kind==="cat"){ landing=2; story=["foundation: a hollow 'cat' enters, no meaning yet…","floor 0 foray: won't close by shape — 'cat' is no bracket. up.","floor 1 syntactic: no delimiter match. up.","floor 2 WAKAKU: closes. the story resolves — a cat you now carry. ✦ lands here."]; }
+  else if(kind==="bracket"){ landing=0; story=["foundation: a ( enters, looking for its )…","floor 0 foray: finds the nearest ). CLOSES by shape. ✦ lands here, instantly."]; }
+  else { landing=6; story=["foundation: [((!(([  enters — all opens, no closes…","floor 0–1: no shape-match completes it. up.","floor 2 wakaku: no span closes it. up.","floor 3 pragmatic: no intent closes it. up.","floor 4 referential: reaches the window — still open. up.","floor 5 THE ROOF: no ) here. it launches OVER THE MOAT.","→ closes downstream, once, in the next reader's castle. not yours."]; }
+  for(let i=0;i<story.length;i++){
+    msg.textContent=story[i];
+    const fl=floors.find(f=>+f.dataset.n===Math.min(i,5));
+    if(fl){fl.style.boxShadow="inset 0 0 24px rgba(224,168,74,0.35)";}
+    await new Promise(r=>setTimeout(r,650));
+    if(fl && (i<story.length-1 || kind!=="roof")) fl.style.boxShadow="";
+  }
+  if(landing<6){
+    const land=floors.find(f=>+f.dataset.n===landing);
+    if(land){land.style.boxShadow="inset 0 0 30px rgba(224,168,74,0.55)";land.classList.add('open');}
+  } else {
+    const roof=floors.find(f=>+f.dataset.n===5);
+    if(roof){roof.style.boxShadow="inset 0 0 30px rgba(201,106,90,0.6)";}
+  }
+}
+
+build();
+document.getElementById('ride').onclick=()=>ride("cat");
+document.getElementById('rideBracket').onclick=()=>ride("bracket");
+document.getElementById('rideRoof').onclick=()=>ride("roof");
+}catch(e){DIAG((e&&e.stack)?e.stack:String(e));}
+})();
+</script>
+</body>
+</html>
